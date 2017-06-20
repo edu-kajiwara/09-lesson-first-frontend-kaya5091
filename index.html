@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<style>
+    /* Full-width input fields */
+    input[type=text], input[type=password] {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+    }
+
+    /* Set a style for all buttons */
+    button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    /* Extra styles for the cancel button */
+    .cancelbtn {
+        padding: 14px 20px;
+        background-color: #f44336;
+    }
+
+    /* Float cancel and signup buttons and add an equal width */
+    .cancelbtn,.signupbtn {
+        float: left;
+        width: 50%;
+    }
+
+    /* Add padding to container elements */
+    .container {
+        padding: 16px;
+    }
+
+    /* Clear floats */
+    .clearfix::after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+    /* Change styles for cancel button and signup button on extra small screens */
+    @media screen and (max-width: 300px) {
+        .cancelbtn, .signupbtn {
+            width: 100%;
+        }
+    }
+</style>
+
+<body>
+<table>
+    <thead>
+    <tr>
+        <th>user_Id</th>
+        <th>user_name</th>
+        <th>update</th>
+        <th>delete</th>
+    </tr>
+    <tbody id = "users"></tbody>
+</table>
+</body>
+<script lang="javascript">
+    const url = 'http://localhost:8080/user';
+    fetch(url).then(function(response) {
+        return response.json();
+    }).then(function(json) {
+        const tbody = document.getElementById('users');
+        json.forEach(function(p1){
+            var newRow = tbody.insertRow(0);
+
+            var newUserCell = newRow.insertCell(0);
+            newUserCell.append(p1['user_id']);
+
+            var newUserNameCell = newRow.insertCell(1);
+            newUserNameCell.append(p1['user_name']);
+
+            var newUserUpdateCell = newRow.insertCell(2);
+            var updateButton =  document.createElement('BUTTON');
+            var updateText = document.createTextNode('Update');
+            updateButton.appendChild(updateText);
+            updateButton.onclick =(function(obj){
+                const updateId = obj.currentTarget.parentElement.parentElement.children[0].textContent;
+                window.location.href = './update.html?user_id=' + updateId;
+            });
+            newUserUpdateCell.appendChild(updateButton);
+
+            var newUserDeleteCell = newRow.insertCell(3);
+            var deleteButton =  document.createElement('BUTTON');
+            var t = document.createTextNode('Delete');
+            deleteButton.appendChild(t);
+            newUserDeleteCell.append(deleteButton)
+
+            deleteButton.appendChild(t)
+            deleteButton.onclick=(function (obj) {
+                const deleteId = obj.currentTarget.parentElement.parentElement.children[0].textContent;
+                fetch(url + '/' + deleteId,{method:'delete'}).then(function(response){
+                    location.reload(true);
+                });
+            });
+            newUserDeleteCell.append(deleteButton);
+
+
+        });
+    });
+
+    const tbody = document.getElementById('users');
+    var newRow = tbody.insertRow(0);
+    newRow.insertCell(0);
+    newRow.insertCell(1);
+    var newAddButtonCell = newRow.insertCell(2);
+    var addButton =  document.createElement('BUTTON');
+    var t = document.createTextNode('Create New User');
+    addButton.appendChild(t);
+    addButton.onclick = (function(){
+        location.href= "add.html";
+    });
+    newAddButtonCell.appendChild(addButton);
+
+
+    window.onload = function() {
+        const button = document.getElementById('create_user');
+        const cancel_button = document.getElementById('cancel_button');
+        const form = document.forms.mainForm;
+        const url = "http://localhost:8080/user";
+        button.onclick = (function(){
+            var user = {};
+            user['user_id'] = form._id.value;
+            user['user_name'] = form._name.value;
+            fetch(url,{
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body:JSON.stringify(user)}).then(function(){
+                location.href = "./index.html";
+            });
+        });
+        cancel_button.onclick = (function(){
+            location.href = "./index.html";
+        });
+    };
+</script>
+</html>
+
